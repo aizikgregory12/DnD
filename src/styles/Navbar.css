@@ -1,0 +1,47 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+nav {
+    margin: 5px;
+    background-color: #333;
+    color: #fff;
+    padding: 10px 0;
+    text-align: center;
+    border-radius: 5px;
+    box-shadow: 0 0 10px #333;
+}
+
+.navBarTitle {
+    margin: 0;
+    font-size: 1.5em;
+}
+
+.navBarList {
+    list-style: none;
+    padding: 0;
+    margin-top: 10px;
+}
+
+.navBarButton {
+    background: none;
+    color: white;
+    border: none;
+    padding: 0.5em 1em;
+    font-size: 1em;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.navBarButton:hover {
+    background-color: #fff;
+    color: #333;
+    box-shadow: 0 0 10px black;
+}
+
+#navBarImg {
+    width: 100px;
+    height: 100px;
+}

@@ -1,0 +1,46 @@
+.statDisplay {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 10px;
+    margin: 10px;
+}
+
+.numbers,
+.labels {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 5px;
+}
+
+.statValue,
+.statLabel {
+    width: 50%;
+}
+
+.statValue {
+    padding: 5px;
+    background-color: white;
+    border-radius: 5px;
+    font-weight: normal;
+    border: 1px solid black;
+    border-radius: 5px;
+}
+
+.statLabel {
+    font-weight: bold;
+}
+
+#middleStatDisplay {
+    margin: 0 5px;
+}
+
+#number {
+    display: flex;
+    width: 30px;
+    justify-content: center;
+    align-items: center;
+}
