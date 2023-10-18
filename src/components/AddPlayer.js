@@ -188,7 +188,7 @@ function AddPlayer({ onAddPlayer, characters, Races }) {
     }
 
     function inform() {
-        alert("Selecting this will use the set value provided for all stats that allow it. For example, a Barbarian will use given value of 7 instead of 1d12 for calculating HP yessir.")
+        alert("Selecting this will use the set value provided for all stats that allow it. For example, a Barbarian will use given value of 7 instead of 1d12 for calculating HP.")
     }
 
     // Return the form

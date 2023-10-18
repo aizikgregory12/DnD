@@ -135,7 +135,8 @@
     justify-content: center;
 }
 
-.topRow button {
+.topRow button,
+#insideButton {
     background: none;
     border: none;
     padding: 0;

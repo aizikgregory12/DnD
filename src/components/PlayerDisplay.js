@@ -28,23 +28,33 @@ export default function PlayerDisplay({ characters, character, selectPlayer, Rac
         }
     };
 
-    const getInitialOtherHp = (char) => {
-        const storedCurrentHp = localStorage.getItem(`currentHp_${char.name}`);
-        const storedTemporaryHp = localStorage.getItem(`temporaryHp_${char.name}`);
 
-        const initialOtherHp = {
-            currentHp: storedCurrentHp ? storedCurrentHp : getInitialHp(char),
-            temporaryHp: storedTemporaryHp ? storedTemporaryHp : 0,
-        };
-
-        return initialOtherHp;
-    };
-    const [otherHp, setOtherHp] = React.useState(getInitialOtherHp(character))
+    const [hitPoints, setHitPoints] = React.useState({
+        currentHp: 0,
+        temporaryHp: 0,
+    });
 
     React.useEffect(() => {
-        localStorage.setItem(`currentHp_${character.name}`, otherHp.currentHp.toString());
-        localStorage.setItem(`temporaryHp_${character.name}`, otherHp.temporaryHp.toString());
-    }, [otherHp, character]);
+        const storedCurrentHp = localStorage.getItem(`currentHp_${character.name}`);
+        const storedTemporaryHp = localStorage.getItem(`temporaryHp_${character.name}`);
+
+        setHitPoints({
+            currentHp: storedCurrentHp ? parseInt(storedCurrentHp) : 0,
+            temporaryHp: storedTemporaryHp ? parseInt(storedTemporaryHp) : 0,
+        });
+    }, [character]);
+
+    React.useEffect(() => {
+        localStorage.setItem(`currentHp_${character.name}`, hitPoints.currentHp);
+        localStorage.setItem(`temporaryHp_${character.name}`, hitPoints.temporaryHp);
+    }, [hitPoints, character]);
+
+    const handleUpdateHitPoints = (type, value) => {
+        setHitPoints((prevHitPoints) => ({
+            ...prevHitPoints,
+            [type]: prevHitPoints[type] + value,
+        }));
+    };
 
 
     function updateInspiration(event) {
@@ -77,22 +87,10 @@ export default function PlayerDisplay({ characters, character, selectPlayer, Rac
         setInitiative((Math.floor(Math.random() * 20) + 1) + calculateModifier("Dexterity"))
     }
 
-    function changeOtherHp(event) {
-        const { name, value } = event.target;
-        if (value === "▲") {
-            setOtherHp((prevValue) => {
-                return {
-                    ...prevValue,
-                    [name]: parseInt(prevValue[name]) + 1,
-                };
-            })
-        } else {
-            setOtherHp((prevValue) => {
-                return {
-                    ...prevValue,
-                    [name]: parseInt(prevValue[name]) - 1,
-                };
-            })
+    function skillCheck(event) {
+        console.log(event)
+        if (character.trainedSkills.includes(event.target.name)) {
+            console.log("trained")
         }
     }
 
@@ -143,7 +141,7 @@ export default function PlayerDisplay({ characters, character, selectPlayer, Rac
                 </div>
                 <div className="skills">
                     {Skills.map((skill, index) =>
-                        <Identifier label={skill.name} value={character.trainedSkills.includes(skill.name) ? calculateModifier(skill.ability) + calcProfBonus() : calculateModifier(skill.ability)} id="skill" numberID="number" />
+                        <Identifier label={skill.name} value={character.trainedSkills.includes(skill.name) ? <button name={skill.name} id='insideButton' onClick={skillCheck}>{calculateModifier(skill.ability) + calcProfBonus()}</button> : <button name={skill.name} id='insideButton' onClick={skillCheck}>{calculateModifier(skill.ability)}</button>} id="skill" numberID="number" />
                     )}
                 </div>
                 <div className='otherStuff'>
@@ -158,24 +156,24 @@ export default function PlayerDisplay({ characters, character, selectPlayer, Rac
                                 Max hit points: <u>{getInitialHp(character)}</u>
                             </div>
                             <div id='currentHp'>
-                                Current hit points: {otherHp.currentHp}
+                                Current hit points: {hitPoints.currentHp}
                                 <div className='inspirationButtons'>
-                                    <button name="currentHp" value="▲" onClick={changeOtherHp}>
+                                    <button name="currentHp" value="▲" onClick={() => handleUpdateHitPoints('currentHp', 1)}>
                                         ▲
                                     </button>
-                                    <button name="currentHp" onClick={changeOtherHp}>
+                                    <button name="currentHp" onClick={() => handleUpdateHitPoints('currentHp', -1)}>
                                         ▼
                                     </button>
                                 </div>
                             </div>
                         </div>
                         <div className='temporaryHP'>
-                            Temporary hit points: {otherHp.temporaryHp}
+                            Temporary hit points: {hitPoints.temporaryHp}
                             <div className='temporaryHpButtons'>
-                                <button name="temporaryHp" value="▲" onClick={changeOtherHp}>
+                                <button name="temporaryHp" value="▲" onClick={() => handleUpdateHitPoints('temporaryHp', 1)}>
                                     ▲
                                 </button>
-                                <button name="temporaryHp" onClick={changeOtherHp}>
+                                <button name="temporaryHp" onClick={() => handleUpdateHitPoints('temporaryHp', -1)}>
                                     ▼
                                 </button>
                             </div>
