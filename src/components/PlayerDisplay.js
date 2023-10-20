@@ -3,6 +3,7 @@ import Identifier from '../Mini-Components/Identifier'
 import StatDisplay from '../Mini-Components/StatDisplay'
 import Skills from '../data/Skills'
 import Classes from '../data/Classes'
+import Items from '../data/Items'
 import '../styles/PlayerDisplay.css'
 
 export default function PlayerDisplay({ characters, character, selectPlayer, Races }) {
@@ -29,9 +30,14 @@ export default function PlayerDisplay({ characters, character, selectPlayer, Rac
     };
 
 
-    const [hitPoints, setHitPoints] = React.useState({
-        currentHp: 0,
-        temporaryHp: 0,
+    const [hitPoints, setHitPoints] = React.useState(() => {
+        const storedCurrentHp = localStorage.getItem(`currentHp_${character.name}`);
+        const storedTemporaryHp = localStorage.getItem(`temporaryHp_${character.name}`);
+
+        return {
+            currentHp: storedCurrentHp ? parseInt(storedCurrentHp) : getInitialHp(character),
+            temporaryHp: storedTemporaryHp ? parseInt(storedTemporaryHp) : 0,
+        };
     });
 
     React.useEffect(() => {
@@ -39,7 +45,7 @@ export default function PlayerDisplay({ characters, character, selectPlayer, Rac
         const storedTemporaryHp = localStorage.getItem(`temporaryHp_${character.name}`);
 
         setHitPoints({
-            currentHp: storedCurrentHp ? parseInt(storedCurrentHp) : 0,
+            currentHp: storedCurrentHp ? parseInt(storedCurrentHp) : getInitialHp(character),
             temporaryHp: storedTemporaryHp ? parseInt(storedTemporaryHp) : 0,
         });
     }, [character]);
@@ -52,7 +58,7 @@ export default function PlayerDisplay({ characters, character, selectPlayer, Rac
     const handleUpdateHitPoints = (type, value) => {
         setHitPoints((prevHitPoints) => ({
             ...prevHitPoints,
-            [type]: prevHitPoints[type] + value,
+            [type]: parseInt(prevHitPoints[type]) + value,
         }));
     };
 
@@ -93,6 +99,41 @@ export default function PlayerDisplay({ characters, character, selectPlayer, Rac
             console.log("trained")
         }
     }
+
+
+
+    const [inventory, setInventory] = React.useState([]);
+    const [selectedItem, setSelectedItem] = React.useState('');
+
+    const saveInventoryToLocalStorage = (inventory) => {
+        localStorage.setItem('inventory', JSON.stringify(inventory));
+    };
+
+    const addItemToInventory = () => {
+        if (selectedItem) {
+            const updatedInventory = [...inventory, selectedItem];
+            setInventory(updatedInventory);
+            saveInventoryToLocalStorage(updatedInventory);
+            setSelectedItem('');
+        }
+    };
+
+    const loadInventoryFromLocalStorage = () => {
+        const storedInventory = localStorage.getItem('inventory');
+        return storedInventory ? JSON.parse(storedInventory) : [];
+    };
+
+    React.useEffect(() => {
+        const loadedInventory = loadInventoryFromLocalStorage();
+        setInventory(loadedInventory);
+    }, []);
+
+    const removeItemFromInventory = (index) => {
+        const updatedInventory = [...inventory]
+        updatedInventory.splice(index, 1)
+        setInventory(updatedInventory)
+        saveInventoryToLocalStorage(updatedInventory)
+    };
 
     return (
         <div className="player-container">
@@ -213,6 +254,42 @@ export default function PlayerDisplay({ characters, character, selectPlayer, Rac
                         ))}
                         <h2 id="savingThrowsLabel">Saving Throws</h2>
                     </div>
+                </div>
+                <div className='otherStuff'>
+                    <h1>Inventory</h1>
+                    <div>
+                        <label>Add Item: </label>
+                        <select
+                            value={selectedItem}
+                            onChange={(e) => setSelectedItem(JSON.parse(e.target.value))}
+                        >
+                            <option value="">
+                                {selectedItem === "" ? "Select an item" : selectedItem.name}
+                            </option>
+
+                            {Object.keys(Items.Weapons).map((weaponCategory) => (
+                                <optgroup label={Items.Weapons[weaponCategory].name}>
+                                    {Object.keys(Items.Weapons[weaponCategory]).map((itemName) => (
+                                        itemName === "name" ? null : (
+                                            <option key={itemName} value={JSON.stringify(Items.Weapons[weaponCategory][itemName])}>
+                                                {Items.Weapons[weaponCategory][itemName].name}
+                                            </option>
+                                        )
+                                    ))}
+                                </optgroup>
+                            ))}
+                        </select>
+                        <button onClick={addItemToInventory}>Add</button>
+                    </div>
+
+                    <ul>
+                        {inventory.map((item, index) => (
+                            <li key={index}>
+                                {item.name}
+                                <button onClick={() => removeItemFromInventory(index)}>Remove</button>
+                            </li>
+                        ))}
+                    </ul>
                 </div>
             </div>
         </div >
