@@ -102,19 +102,21 @@ export default function PlayerDisplay({ characters, character, selectPlayer, Rac
 
 
 
+    const [selectedItemToAdd, setSelectedItemToAdd] = React.useState('');
+    const [selectedItemToRemove, setSelectedItemToRemove] = React.useState('');
     const [inventory, setInventory] = React.useState([]);
-    const [selectedItem, setSelectedItem] = React.useState('');
+    const [newItem, setNewItem] = React.useState('');
 
     const saveInventoryToLocalStorage = (inventory) => {
         localStorage.setItem('inventory', JSON.stringify(inventory));
     };
 
     const addItemToInventory = () => {
-        if (selectedItem) {
-            const updatedInventory = [...inventory, selectedItem];
+        if (selectedItemToAdd) {
+            const updatedInventory = [...inventory, selectedItemToAdd];
             setInventory(updatedInventory);
             saveInventoryToLocalStorage(updatedInventory);
-            setSelectedItem('');
+            setSelectedItemToAdd('')
         }
     };
 
@@ -128,11 +130,22 @@ export default function PlayerDisplay({ characters, character, selectPlayer, Rac
         setInventory(loadedInventory);
     }, []);
 
-    const removeItemFromInventory = (index) => {
-        const updatedInventory = [...inventory]
-        updatedInventory.splice(index, 1)
-        setInventory(updatedInventory)
-        saveInventoryToLocalStorage(updatedInventory)
+    const removeItemFromInventory = () => {
+        if (selectedItemToRemove !== '') {
+            const updatedInventory = inventory.filter((item, index) => index !== parseInt(selectedItemToRemove));
+            setInventory(updatedInventory);
+            saveInventoryToLocalStorage(updatedInventory);
+            setSelectedItemToRemove('')
+        }
+    };
+
+    const addNewItemToInventory = () => {
+        if (newItem) {
+            const updatedInventory = [...inventory, { name: newItem }];
+            setInventory(updatedInventory);
+            saveInventoryToLocalStorage(updatedInventory);
+            setNewItem(''); // Clear the input field after adding the item
+        }
     };
 
     return (
@@ -255,41 +268,99 @@ export default function PlayerDisplay({ characters, character, selectPlayer, Rac
                         <h2 id="savingThrowsLabel">Saving Throws</h2>
                     </div>
                 </div>
-                <div className='otherStuff'>
-                    <h1>Inventory</h1>
-                    <div>
-                        <label>Add Item: </label>
-                        <select
-                            value={selectedItem}
-                            onChange={(e) => setSelectedItem(JSON.parse(e.target.value))}
-                        >
-                            <option value="">
-                                {selectedItem === "" ? "Select an item" : selectedItem.name}
-                            </option>
+                <div className='otherStuff' id="inventoryPanel">
+                    <h2 id="inventoryLabel">Inventory</h2>
+                    <div className='inventoryButtons'>
+                        <div>
+                            <label>Add Weapon: </label>
+                            <select
+                                value={selectedItemToAdd}
+                                onChange={(e) => setSelectedItemToAdd(JSON.parse(e.target.value))}
+                            >
+                                <option value="">
+                                    {selectedItemToAdd === "" ? "Select an item" : selectedItemToAdd.name}
+                                </option>
 
-                            {Object.keys(Items.Weapons).map((weaponCategory) => (
-                                <optgroup label={Items.Weapons[weaponCategory].name}>
-                                    {Object.keys(Items.Weapons[weaponCategory]).map((itemName) => (
-                                        itemName === "name" ? null : (
-                                            <option key={itemName} value={JSON.stringify(Items.Weapons[weaponCategory][itemName])}>
-                                                {Items.Weapons[weaponCategory][itemName].name}
-                                            </option>
-                                        )
-                                    ))}
-                                </optgroup>
-                            ))}
-                        </select>
-                        <button onClick={addItemToInventory}>Add</button>
+                                {Object.keys(Items.Weapons).map((weaponCategory) => (
+                                    <optgroup label={Items.Weapons[weaponCategory].name}>
+                                        {Object.keys(Items.Weapons[weaponCategory]).map((itemName) => (
+                                            itemName === "name" ? null : (
+                                                <option key={itemName} value={JSON.stringify(Items.Weapons[weaponCategory][itemName])}>
+                                                    {Items.Weapons[weaponCategory][itemName].name}
+                                                </option>
+                                            )
+                                        ))}
+                                    </optgroup>
+                                ))}
+                            </select>
+                            <button onClick={addItemToInventory}>Add</button>
+                        </div>
+
+                        <div>
+                            <label>Add Armor: </label>
+                            <select
+                                value={selectedItemToAdd}
+                                onChange={(e) => setSelectedItemToAdd(JSON.parse(e.target.value))}
+                            >
+                                <option value="">
+                                    {selectedItemToAdd === "" ? "Select an item" : selectedItemToAdd.name}
+                                </option>
+
+                                {Object.keys(Items.Armor).map((armorCategory) => (
+                                    <optgroup label={Items.Armor[armorCategory].name}>
+                                        {Object.keys(Items.Armor[armorCategory]).map((itemName) => (
+                                            itemName === "name" ? null : (
+                                                <option key={itemName} value={JSON.stringify(Items.Armor[armorCategory][itemName])}>
+                                                    {Items.Armor[armorCategory][itemName].name}
+                                                </option>
+                                            )
+                                        ))}
+                                    </optgroup>
+                                ))}
+                            </select>
+                            <button onClick={addItemToInventory}>Add</button>
+                        </div>
+
+                        <div>
+                            <label>Add Item: </label>
+                            <input
+                                type="text"
+                                value={newItem}
+                                placeholder='Enter item name'
+                                maxLength={40}
+                                onChange={(e) => setNewItem(e.target.value)}
+                            />
+                            <button onClick={addNewItemToInventory}>Add</button>
+                        </div>
+
+                        <div>
+                            <label>Remove Item: </label>
+                            <select
+                                value={selectedItemToRemove}
+                                onChange={(e) => setSelectedItemToRemove(e.target.value)}
+                            >
+                                <option value="" disabled>
+                                    {selectedItemToRemove === "" ? "Select an item to remove" : "Select an item to remove"}
+                                </option>
+                                {inventory.map((item, index) => (
+                                    <option key={index} value={index}>
+                                        {item.name}
+                                    </option>
+                                ))}
+                            </select>
+                            <button onClick={removeItemFromInventory}>Remove</button>
+                        </div>
                     </div>
 
-                    <ul>
-                        {inventory.map((item, index) => (
-                            <li key={index}>
-                                {item.name}
-                                <button onClick={() => removeItemFromInventory(index)}>Remove</button>
-                            </li>
-                        ))}
-                    </ul>
+                    <div>
+                        <ul className='inventoryList'>
+                            {inventory.map((item, index) => (
+                                <li key={index} id='inventoryItem'>
+                                    {item.name}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div >

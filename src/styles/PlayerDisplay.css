@@ -200,3 +200,36 @@
     width: 100%;
     text-align: center;
 }
+
+#inventoryLabel {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+#inventoryPanel {
+    width: 400px;
+    padding: 5px;
+}
+
+.inventoryButtons {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+}
+
+.inventoryList {
+    display: flex;
+    flex-wrap: wrap;
+    max-width: 300px;
+    margin: 5px;
+    padding: 5px;
+}
+
+#inventoryItem {
+    margin-right: 5px;
+    background-color: white;
+    border: 1px solid black;
+    border-radius: 5px;
+    padding: 5px;
+}
